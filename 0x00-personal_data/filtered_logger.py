@@ -33,6 +33,7 @@ class RedactingFormatter(logging.Formatter):
         """Filter values in incoming log records using filter_datum method"""
         message_format = filter_datum(self.fields,
                                       RedactingFormatter.REDACTION,
-                                      super(RedactingFormatter, self).format(record),
+                                      super(RedactingFormatter, self).format(
+                                        record),
                                       RedactingFormatter.SEPARATOR)
         return message_format
