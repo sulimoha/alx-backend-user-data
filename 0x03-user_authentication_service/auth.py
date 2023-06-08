@@ -95,4 +95,3 @@ class Auth:
             return None
 
         self._db.update_user(user.id, session_id=None)
-    
