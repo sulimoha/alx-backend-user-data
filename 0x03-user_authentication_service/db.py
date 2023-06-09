@@ -8,7 +8,6 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
 from user import Base, User
-from typing import Type
 
 
 class DB:
@@ -34,23 +33,18 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """ Create a User
-        :param email: the user email (requirement)
-        :param hashed_password: the user password (requirement)
-        :return: A User Object
         """
-        user = User(email=email, hashed_password=hashed_password)
+        user: User = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
         self._session.commit()
 
         return user
 
-    def find_user_by(self, **kwargs) -> Type[User]:
+    def find_user_by(self, **kwargs) -> User:
         """ Find a User by its ID
-        :param kwargs: arbitrary keyword arguments
-        :return: The first row found in the users table
         """
         try:
-            user = self._session.query(User).filter_by(**kwargs).first()
+            user: User = self._session.query(User).filter_by(**kwargs).first()
         except InvalidRequestError:
             raise InvalidRequestError
 
@@ -61,16 +55,13 @@ class DB:
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """ Update a User by its ID
-        :param user_id: the user ID
-        :param kwargs: arbitrary keyword arguments
-        :return: None
         """
-        try:
-            user = self.find_user_by(id=user_id)
-            for name, value in kwargs.items():
-                if hasattr(user, name):
-                    setattr(user, name, value)
-        except ValueError:
-            raise ValueError
+        user: User = self.find_user_by(id=user_id)
+        for name, value in kwargs.items():
+            if not hasattr(user, name):
+                raise ValueError
+            else:
+                setattr(user, name, value)
 
+        self._session.add(user)
         self._session.commit()
